@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body></body>
+<script src="three.min.js"></script>
+<script src="CanvasRenderer.js"></script>
+<script src="Projector.js"></script>
+<script src="OrbitControls.js"></script>
+<script type="text/javascript" src="dat.gui.js"></script>
+<script>
+
+
+var Elektrona1_speed = 2;
+var Elektrona2_speed = 2;
+var Elektrona3_speed = 2;
+
+
+var Elektrona1_disatance = 150;
+var Elektrona2_disatance = 150;
+var Elektrona3_disatance = 150;
+
+
+
+var scene = new THREE.Scene();
+
+var aspectRatio = window.innerWidth / window.innerHeight;
+var camera = new THREE.PerspectiveCamera(75, aspectRatio, 1, 10000);
+camera.position.z = 350;
+this.controls = new THREE.OrbitControls( this.camera );
+scene.add(camera);
+
+
+
+
+this.setupGUI();
+
+
+
+
+var shape = new THREE.SphereGeometry(100, 64, 64);
+var electronMaterial = new THREE.MeshStandardMaterial( {
+				emissive: new THREE.Color("#35b44c"),
+                metalness: 0
+            } );
+var protonMaterial = new THREE.MeshStandardMaterial( {
+				emissive: new THREE.Color("#ff0000"),
+
+                metalness: 0
+            } );
+var nucleus = new THREE.Mesh(shape, protonMaterial);
+scene.add(nucleus);
+
+var electronShape = new THREE.SphereGeometry(20, 32, 32);
+var electron1 = new THREE.Mesh(electronShape, electronMaterial);
+nucleus.add(electron1);
+
+electron1.position.set(-150,150,0);
+
+
+var electron2 = new THREE.Mesh(electronShape, electronMaterial);
+nucleus.add(electron2);
+electron2.position.set(150,150,0);
+
+var electron3 = new THREE.Mesh(electronShape, electronMaterial);
+nucleus.add(electron3);
+electron3.position.set(0,0,150);
+
+/** Izmantots WeBGlRenderer lai nodroshinatu labaaaku veiktspeeju*/
+var renderer = new THREE.WebGLRenderer({antialias: true});
+renderer.setClearColor("#d7d7d7")
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+
+document.body.appendChild(renderer.domElement);
+
+var clock = new THREE.Clock();
+
+
+
+
+function setupGUI() {
+    var gui = new dat.GUI();
+    gui.add(this, "Elektrona1_speed", -20, 20);
+    gui.add(this, "Elektrona2_speed", -20, 20);
+    gui.add(this, "Elektrona3_speed", -20, 20);
+
+    gui.add(this, "Elektrona1_disatance", -300, 300);
+    gui.add(this, "Elektrona2_disatance", -300, 300);
+    gui.add(this, "Elektrona3_disatance", -300, 300)
+
+
+}
+
+
+
+function animate() {
+  requestAnimationFrame(animate);
+  var t = clock.getElapsedTime();
+  renderer.render(scene, camera);
+
+  electron1.position.x = Math.sin(Elektrona1_speed*t) * -150;
+  electron1.position.y = Math.sin(Elektrona1_speed*t) * Elektrona1_disatance;
+  electron1.position.z = Math.cos(Elektrona1_speed*t) * Elektrona1_disatance;
+
+
+  electron2.position.x = Math.cos(Elektrona2_speed*t) * Elektrona2_disatance;
+  electron2.position.y = Math.cos(Elektrona2_speed*t) * Elektrona2_disatance;
+  electron2.position.z = Math.sin(Elektrona2_speed*t) * Elektrona2_disatance;
+
+
+  var tOffset = 1.5 + clock.getElapsedTime();
+
+  electron3.position.x = 0;
+  electron3.position.y = Math.sin(Elektrona3_speed*tOffset) * Elektrona3_disatance;
+  electron3.position.z = Math.cos(Elektrona3_speed*tOffset) * Elektrona3_disatance;
+    }
+
+    // Run the animation.
+    animate();
+</script>
+</html>
