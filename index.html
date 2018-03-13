@@ -11,14 +11,17 @@
 <script>
 
 
-var Elektrona1_speed = 2;
+/*var Elektrona1_speed = 2;
 var Elektrona2_speed = 2;
 var Elektrona3_speed = 2;
 
 
 var Elektrona1_disatance = 150;
 var Elektrona2_disatance = 150;
-var Elektrona3_disatance = 150;
+var Elektrona3_disatance = 150;*/
+
+var elekctronConfig = [{distance: 150, speed: 2, ass: `xyz`}, {distance: 150, speed: 2,  ass: `yxz`}, {distance: 150, speed: 2,  ass: `zxy`}];
+var elektrons = [];
 
 
 
@@ -31,20 +34,27 @@ this.controls = new THREE.OrbitControls( this.camera );
 scene.add(camera);
 
 
-
-
 this.setupGUI();
 
+
+
+var light = new THREE.PointLight( "#d4d4d4", 1, 10000 );
+light.position.set( 1000, 50, 1000 );
+scene.add( light );
+
+var light2 = new THREE.PointLight( "#d4d4d4", 1, 10000 );
+light2.position.set( 1000, 50, -1000 );
+scene.add( light2 );
 
 
 
 var shape = new THREE.SphereGeometry(100, 64, 64);
 var electronMaterial = new THREE.MeshStandardMaterial( {
-				emissive: new THREE.Color("#35b44c"),
+				color: new THREE.Color("#35b44c"),
                 metalness: 0
             } );
 var protonMaterial = new THREE.MeshStandardMaterial( {
-				emissive: new THREE.Color("#ff0000"),
+				color: new THREE.Color("#ff0000"),
 
                 metalness: 0
             } );
@@ -52,19 +62,18 @@ var nucleus = new THREE.Mesh(shape, protonMaterial);
 scene.add(nucleus);
 
 var electronShape = new THREE.SphereGeometry(20, 32, 32);
-var electron1 = new THREE.Mesh(electronShape, electronMaterial);
-nucleus.add(electron1);
-
-electron1.position.set(-150,150,0);
 
 
-var electron2 = new THREE.Mesh(electronShape, electronMaterial);
-nucleus.add(electron2);
-electron2.position.set(150,150,0);
 
-var electron3 = new THREE.Mesh(electronShape, electronMaterial);
-nucleus.add(electron3);
-electron3.position.set(0,0,150);
+
+for (var i = 0; i < 3; i++){
+
+    var electron = new THREE.Mesh(electronShape, electronMaterial);
+    nucleus.add(electron);
+
+    elektrons.push(electron)
+}
+
 
 /** Izmantots WeBGlRenderer lai nodroshinatu labaaaku veiktspeeju*/
 var renderer = new THREE.WebGLRenderer({antialias: true});
@@ -81,13 +90,11 @@ var clock = new THREE.Clock();
 
 function setupGUI() {
     var gui = new dat.GUI();
-    gui.add(this, "Elektrona1_speed", -20, 20);
-    gui.add(this, "Elektrona2_speed", -20, 20);
-    gui.add(this, "Elektrona3_speed", -20, 20);
 
-    gui.add(this, "Elektrona1_disatance", -300, 300);
-    gui.add(this, "Elektrona2_disatance", -300, 300);
-    gui.add(this, "Elektrona3_disatance", -300, 300)
+    for (var i = 0; i < 3; i++){
+        gui.add(elekctronConfig[i], `speed`, -20, 20);
+        gui.add(elekctronConfig[i], `distance`, -300, 300);
+    }
 
 
 }
@@ -99,21 +106,18 @@ function animate() {
   var t = clock.getElapsedTime();
   renderer.render(scene, camera);
 
-  electron1.position.x = Math.sin(Elektrona1_speed*t) * -150;
-  electron1.position.y = Math.sin(Elektrona1_speed*t) * Elektrona1_disatance;
-  electron1.position.z = Math.cos(Elektrona1_speed*t) * Elektrona1_disatance;
+
+  for (var i = 0; i < 3; i++){
+
+      elektrons[i].position[elekctronConfig[i].ass[0]] = Math.sin(elekctronConfig[i].speed*t) * - elekctronConfig[i].distance;
+      elektrons[i].position[elekctronConfig[i].ass[1]] = Math.sin(elekctronConfig[i].speed*t) * elekctronConfig[i].distance;
+      elektrons[i].position[elekctronConfig[i].ass[2]] = Math.cos(elekctronConfig[i].speed*t) * elekctronConfig[i].distance;
 
 
-  electron2.position.x = Math.cos(Elektrona2_speed*t) * Elektrona2_disatance;
-  electron2.position.y = Math.cos(Elektrona2_speed*t) * Elektrona2_disatance;
-  electron2.position.z = Math.sin(Elektrona2_speed*t) * Elektrona2_disatance;
-
+  }
 
   var tOffset = 1.5 + clock.getElapsedTime();
 
-  electron3.position.x = 0;
-  electron3.position.y = Math.sin(Elektrona3_speed*tOffset) * Elektrona3_disatance;
-  electron3.position.z = Math.cos(Elektrona3_speed*tOffset) * Elektrona3_disatance;
     }
 
     // Run the animation.
